@@ -15,6 +15,7 @@
 | Skill | Slash command | Description |
 |-------|--------------|-------------|
 | `punto` | `/punto` | Fixes text typed on the wrong keyboard layout (EN ↔ RU/UK) |
+| `homeassistant-apps` | — | Home Assistant app development for j0rsa/home-assistant-apps |
 
 ## Adding a New Skill
 
