@@ -1,0 +1,5 @@
+{
+  "name": "punto",
+  "version": "1.0.0",
+  "description": "Keyboard layout fixer — detects and converts text typed on the wrong layout (EN ↔ RU/UK)"
+}

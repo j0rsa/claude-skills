@@ -8,42 +8,32 @@ Use this when you want to develop and publish skills through a marketplace repo 
 
 ## How It Works
 
-The script reads `.claude-plugin/marketplace.json` from the repo root, finds each registered skill path, and creates a symlink in `~/.claude/skills/`.
+The script reads `.claude-plugin/marketplace.json` from the repo root, resolves each plugin's `source` path, finds all skill directories under `<plugin-source>/skills/`, and creates symlinks at `~/.claude/skills/<plugin-name>/<skill-name>` — always namespaced under the plugin.
 
-### Namespace detection
-
-| Plugin condition | Target path |
-|---|---|
-| Plugin has **one** skill | `~/.claude/skills/<skill-name>` |
-| Plugin has **multiple** skills | `~/.claude/skills/<plugin-name>/<skill-name>` |
-| `--flat` flag used | `~/.claude/skills/<skill-name>` (always, no namespace folder) |
-
-This matches the convention Claude Code uses when installing namespaced skills (e.g. `hookify:conversation-analyzer` lives at `~/.claude/skills/hookify/conversation-analyzer`).
+> **Note:** This script links **skills only**. Plugin agents (in `agents/`) are not linked here — they must be installed via `/plugin install` or added manually to `~/.claude/agents/`.
 
 ## Prerequisites
 
 - `jq` must be installed (`brew install jq` or `apt install jq`)
 - The repo must have `.claude-plugin/marketplace.json`
+- Plugins must follow the standard layout: `plugins/<name>/skills/<skill-name>/SKILL.md`
 
 ## Usage
 
-Run the script from the **root of your marketplace repo** (not from inside the skills folder):
+Run the script from the **root of your marketplace repo**:
 
 ```bash
-# Link all skills in marketplace.json
+# Link all skills discovered across all plugins
 bash /path/to/marketplace-skills-creator/scripts/link_skill_locally.sh
 
 # Preview without making changes
 bash /path/to/marketplace-skills-creator/scripts/link_skill_locally.sh --dry-run
 
-# Link only specific skills
+# Link only specific skills (by skill name)
 bash /path/to/marketplace-skills-creator/scripts/link_skill_locally.sh punto
 
 # Force-replace existing symlinks
 bash /path/to/marketplace-skills-creator/scripts/link_skill_locally.sh --force
-
-# Skip namespace folders (flat layout)
-bash /path/to/marketplace-skills-creator/scripts/link_skill_locally.sh --flat
 ```
 
 If this skill is itself installed or symlinked locally:
@@ -58,24 +48,23 @@ bash ~/.claude/skills/marketplace-skills-creator/scripts/link_skill_locally.sh
 |---|---|
 | `--force` | Replaces existing symlinks. If the target is a real directory (non-symlink), deletes it — **back up any local-only work first** |
 | `--dry-run` | Prints what would happen without creating or removing anything |
-| `--flat` | Links directly under `~/.claude/skills/<skill-name>` regardless of plugin size |
 
 ## Override an Existing Locally Developed Skill
 
-If you have a skill you've been developing locally at `~/.claude/skills/<skill-name>` and you now want to replace it with the marketplace version (or make the marketplace version the live edit target), use `--force`:
+If you have a skill you've been developing locally at `~/.claude/skills/<plugin-name>/<skill-name>` and you now want to replace it with the marketplace version, use `--force`:
 
 ```bash
 bash ~/.claude/skills/marketplace-skills-creator/scripts/link_skill_locally.sh --force <skill-name>
 ```
 
 **Before running `--force` on a real directory:**
-1. Check if it's already a symlink: `ls -la ~/.claude/skills/<skill-name>`
+1. Check if it's already a symlink: `ls -la ~/.claude/skills/<plugin-name>/<skill-name>`
 2. If it's a real folder with unpublished changes, copy them into the repo first
 3. Then run with `--force`
 
 ## Re-link After a Pull
 
-After pulling upstream changes that add new skills to `marketplace.json`, re-run the script (without `--force`) to pick up the new skill paths. Already-linked skills are detected by their source path and skipped automatically.
+After pulling upstream changes that add new skills, re-run the script (without `--force`) to pick up the new skill directories. Already-linked skills are detected by their source path and skipped automatically.
 
 ## Verify
 
@@ -91,7 +80,7 @@ Restart (or reload) your Claude Code session so it picks up the newly available 
 
 ## Example Walkthrough
 
-**Repo:** `~/projects/claude-skills` (flat marketplace, one plugin `j0rsa-skills`, one skill `punto`)
+**Repo:** `~/projects/claude-skills` (marketplace `j0rsa-skills`, plugin `punto`, skill `punto`)
 
 ```bash
 cd ~/projects/claude-skills
@@ -103,9 +92,9 @@ Output:
 Repo root  : /Users/user/projects/claude-skills
 Skills dir : /Users/user/.claude/skills
 
-Skill : punto  (plugin: j0rsa-skills)
-  source → /Users/user/projects/claude-skills/punto
-  target → /Users/user/.claude/skills/punto
+Skill : punto  (plugin: punto)
+  source → /Users/user/projects/claude-skills/plugins/punto/skills/punto
+  target → /Users/user/.claude/skills/punto/punto
   ✓ Linked
 
 ────────────────────────────────────────────
@@ -114,17 +103,17 @@ Skill : punto  (plugin: j0rsa-skills)
   Errors  : 0
 ```
 
-**Repo:** `~/projects/zalando-skills` (hierarchical, plugin `zalando-employee`, skills `feedback-giver` + `focus-area-composer`)
+**Repo:** `~/projects/my-skills` (plugin `my-plugin` with two skills: `skill-a` and `skill-b`)
 
 ```bash
-cd ~/projects/zalando-skills
+cd ~/projects/my-skills
 bash ~/.claude/skills/marketplace-skills-creator/scripts/link_skill_locally.sh
 ```
 
 Creates:
 ```
 ~/.claude/skills/
-└── zalando-employee/
-    ├── feedback-giver     → /projects/zalando-skills/zalando-employee/skills/feedback-giver
-    └── focus-area-composer → /projects/zalando-skills/zalando-employee/skills/focus-area-composer
+└── my-plugin/
+    ├── skill-a   → /projects/my-skills/plugins/my-plugin/skills/skill-a
+    └── skill-b   → /projects/my-skills/plugins/my-plugin/skills/skill-b
 ```

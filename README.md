@@ -1,6 +1,6 @@
 # j0rsa-skills
 
-Personal Claude Code skills marketplace by j0rsa.
+Personal Claude Code plugin marketplace by j0rsa.
 
 ## Installation
 
@@ -8,14 +8,15 @@ Personal Claude Code skills marketplace by j0rsa.
 /plugin marketplace add j0rsa/claude-skills
 /plugin install punto@j0rsa-skills
 /plugin install marketplace-skills-creator@j0rsa-skills
+/plugin install homeassistant-apps@j0rsa-skills
 ```
 
-## Skills
+## Plugins
 
-| Skill | Plugin | Slash command | Description |
-|-------|--------|--------------|-------------|
+| Plugin | Skill | Slash command | Description |
+|--------|-------|--------------|-------------|
 | `punto` | `punto` | auto-detected¹ | Fixes text typed on the wrong keyboard layout (EN ↔ RU/UK) |
 | `marketplace-skills-creator` | `marketplace-skills-creator` | `/marketplace-skills-creator` | Sets up and maintains Claude Code plugin marketplaces |
 | `homeassistant-apps` | `homeassistant-apps` | — | Home Assistant app development for j0rsa/home-assistant-apps |
 
-¹ `punto` is designed to trigger automatically when Claude detects garbled text from a wrong keyboard layout. `/punto` works too but is just a side effect of how skills are registered — you don't need to invoke it explicitly.
+¹ `punto` is designed to trigger automatically when Claude detects garbled text from a wrong keyboard layout.

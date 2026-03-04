@@ -1,36 +1,26 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "j0rsa-skills",
-  "metadata": {
-    "description": "Personal Claude Code skills by j0rsa",
-    "version": "1.0.0"
+  "version": "1.0.0",
+  "description": "Personal Claude Code plugin marketplace by j0rsa",
+  "owner": {
+    "name": "j0rsa"
   },
   "plugins": [
     {
       "name": "punto",
-      "description": "Keyboard layout fixer (EN ↔ RU/UK)",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./punto"
-      ]
+      "description": "Keyboard layout fixer — detects and converts text typed on the wrong layout (EN ↔ RU/UK)",
+      "source": "./plugins/punto"
     },
     {
       "name": "marketplace-skills-creator",
       "description": "Tools for setting up and maintaining Claude Code plugin marketplaces",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./marketplace-skills-creator"
-      ]
+      "source": "./plugins/marketplace-skills-creator"
     },
     {
       "name": "homeassistant-apps",
       "description": "Home Assistant app development for the j0rsa/home-assistant-apps repository",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./homeassistant-apps"
-      ]
+      "source": "./plugins/homeassistant-apps"
     }
   ]
 }
