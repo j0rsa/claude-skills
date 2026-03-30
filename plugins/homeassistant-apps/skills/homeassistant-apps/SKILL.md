@@ -16,6 +16,7 @@ Follow this sequence for every app change:
 Before making any changes, read the app's key files:
 
 - `config.yaml` - Current version, options, schema, ports, architecture
+- `translations/en.yaml` - Human-readable names and descriptions for config options (if present)
 - `www/` directory - Web UI files (if present): `index.html`, `app.js`, `converter.js`, `style.css`
 - `run.sh` - Container entry point
 - `Dockerfile` - Build instructions
@@ -57,7 +58,11 @@ Format rules:
 - Keep entries concise (one line each)
 - Group related changes under the same version
 
-### 5. Update Documentation Page
+### 5. Update Translations (MANDATORY for apps with config options)
+
+If `translations/en.yaml` exists, update it to match any new or changed options. If it doesn't exist yet, create it. Every option in `config.yaml` `options:` must have a `name` and `description` in the translations file.
+
+### 6. Update Documentation Page
 
 If `docs/_apps/<app-name>.md` exists, review it for accuracy:
 
@@ -66,7 +71,7 @@ If `docs/_apps/<app-name>.md` exists, review it for accuracy:
 - Are security implications documented?
 - Do configuration examples reflect current options?
 
-### 6. Update docs/index.md (new apps only)
+### 7. Update docs/index.md (new apps only)
 
 When **creating a new app**, add an entry to `docs/index.md` under the appropriate category section. Follow the existing format:
 
@@ -96,6 +101,8 @@ home-assistant-apps/
 │   ├── README.md           # App documentation
 │   ├── icon.png            # App icon
 │   ├── logo.png            # App logo
+│   ├── translations/       # UI field descriptions (recommended)
+│   │   └── en.yaml
 │   └── www/                # Web UI files (for web-based apps)
 │       ├── index.html
 │       ├── app.js
@@ -143,6 +150,48 @@ Key fields:
 - `codenotary` - Always `"red.avtovo@gmail.com"`
 - `image` - Always uses `ghcr.io/j0rsa/haddon-<slug>-{arch}` pattern
 - `arch` - Typically `aarch64` and `amd64`
+
+## Translations (translations/en.yaml)
+
+Every app with config options should have a `translations/en.yaml` file that provides human-readable names and descriptions for the HA UI. This file is displayed in the app's configuration panel.
+
+**Structure:**
+
+```yaml
+configuration:
+  <option_name>:
+    name: Human-Readable Name
+    description: >-
+      Multi-line description explaining what this option does,
+      valid values, and any defaults.
+network:
+  <port>/tcp: Short port description
+```
+
+**Rules:**
+- Every key in `config.yaml` `options:` must have a corresponding entry in `configuration:`
+- Every key in `config.yaml` `ports:` should have a corresponding entry in `network:`
+- Use `>-` (folded block scalar) for multi-line descriptions
+- Descriptions should explain what the option does, valid values, and behavior when left blank
+- Reference: [Mosquitto translations](https://github.com/home-assistant/addons/blob/master/mosquitto/translations/en.yaml)
+
+**Example:**
+
+```yaml
+configuration:
+  api_key:
+    name: API Key
+    description: >-
+      Authentication key for the REST API. If left blank, the API runs
+      without authentication. Consider setting this for production use.
+  log_level:
+    name: Log Level
+    description: >-
+      Controls log verbosity. Options: TRACE, DEBUG, INFO, WARN, ERROR.
+network:
+  6333/tcp: REST API port
+  6334/tcp: gRPC API port
+```
 
 ## Web UI Patterns
 
@@ -346,6 +395,7 @@ After every app update, verify:
 
 - [ ] Version bumped in `config.yaml`
 - [ ] `CHANGELOG.md` updated with new entry
+- [ ] `translations/en.yaml` updated to match config options
 - [ ] `docs/_apps/<name>.md` reviewed and updated if needed
 - [ ] Entry added to `docs/index.md` under the correct category (new apps only)
 - [ ] CSS uses only theme variables (no hardcoded colors)
